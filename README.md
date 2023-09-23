@@ -10,7 +10,7 @@ computer vision class homeworks
 
 
 
-**to run the file**
+**to run the file** ( in  * / *_ws)
 ```
 mkdir build && cmake .. && make
 ```
