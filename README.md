@@ -3,6 +3,9 @@ computer vision class hub
 ----------
 computer vision class homeworks
 
+|OS|Version|
+|---|---|
+|ubuntu|20.04|
 
 
 

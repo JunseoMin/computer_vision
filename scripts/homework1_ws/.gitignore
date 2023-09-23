@@ -1,2 +1,5 @@
-*/.vscode/*
-*/build/*
+**/.vscode/*
+**/build/*
+docs/**/*.pdf
+docs/**/*.zip
+**/*.json
