@@ -9,5 +9,14 @@ computer vision class homeworks
    
 **to run the file** ( in  * / *_ws)
 ```
-mkdir build && cmake .. && make
+mkdir build && cd build
+```
+
+```
+cmake . && make 
+```
+
+after build,
+```
+./<cpp file name>
 ```
