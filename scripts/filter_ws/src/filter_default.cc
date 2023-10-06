@@ -23,17 +23,16 @@ int main(void){
 
     color_img=imread("/home/junseo/2023-2/computer_vision/images/kkang_tae.jpg");
     
-    cvtColor(color_img,gray_img,COLOR_BGR2GRAY);
+    cvtColor(color_img, gray_img, COLOR_BGR2GRAY);
 
     filtering(FILTER_SIZE, color_img);
-    filtering(FILTER_SIZE,gray_img);
+    filtering(FILTER_SIZE, gray_img);
 
     return 0;
 }
 
-void padding(int select)
-// select: 1 = zero_padding , 2 = repetition_padding , 3 = mirror_padding
-{
+void padding(int select){
+    // select: 1 = zero_padding , 2 = repetition_padding , 3 = mirror_padding
     switch (select)
     {
     case 1:
@@ -66,7 +65,6 @@ void mirror_padding(){
 
 }
 
-void filtering(int filter_size, Mat img_input)
-{
-
+void filtering(int filter_size, Mat img_input){
+    // 
 }
