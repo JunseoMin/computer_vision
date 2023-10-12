@@ -8,3 +8,6 @@ target_link_libraries(filter_default ${OpenCV_LIBS})
 
 add_executable(filters src/filters.cc)
 target_link_libraries(filters ${OpenCV_LIBS})
+
+add_executable(asd src/asd.cc)
+target_link_libraries(asd ${OpenCV_LIBS})
