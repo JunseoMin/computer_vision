@@ -27,7 +27,7 @@ Mat applyMovingAverage(const Mat& input) {
     int cols = input.cols;
     int filter_size = 3;
 
-    Mat output(rows, cols, CV_8U);
+    Mat output(rows, cols, input.type());
 
     for (int y = 1; y < rows - 1; y++) {
         for (int x = 1; x < cols - 1; x++) {
@@ -50,7 +50,7 @@ Mat applyLaplacian(const Mat& input) {
     int rows = input.rows;
     int cols = input.cols;
 
-    Mat output(rows, cols, CV_8S);
+    Mat output(rows, cols, input.type());
 
     for (int y = 1; y < rows - 1; y++) {
         for (int x = 1; x < cols - 1; x++) {
@@ -74,7 +74,7 @@ Mat applySharpening(const Mat& input, const Mat& laplacian) {
     int rows = input.rows;
     int cols = input.cols;
 
-    Mat output(rows, cols, CV_8U);
+    Mat output(rows, cols, input.type());
 
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
