@@ -88,8 +88,8 @@ void repetition_padding(const Mat &input_mat, Mat &padded_mat, const int padding
     for (int x = 0; x < padded_mat.cols; x++) {
         for (int y = 0; y < padded_mat.rows; y++) {
             int padded_index = y * padded_mat.cols + x;
-            int input_x = std::max(0, std::min(x - (padding_size - 1) / 2, input_mat.cols - 1));
-            int input_y = std::max(0, std::min(y - (padding_size - 1) / 2, input_mat.rows - 1));
+            int input_x = max(0, min(x - (padding_size - 1) / 2, input_mat.cols - 1));
+            int input_y = max(0, min(y - (padding_size - 1) / 2, input_mat.rows - 1));
             int input_index = input_y * input_mat.cols + input_x;
             padded_mat.data[padded_index] = input_mat.data[input_index];
         }
