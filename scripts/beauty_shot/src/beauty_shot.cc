@@ -60,6 +60,9 @@ void get_sliced(const Mat& origin, Mat& sliced) {
 
 void make_beauty(const Mat& origin,Mat& sliced){
     Mat padding(origin.rows,origin.cols,origin.type());
+    int intensity_pluser=80;    // make pixel brighter
+    int red_offset=40;
+    // vector<unsigned char> edge;
 
     for (int x = 0; x < origin.cols; x++) {
         for (int y = 0; y < origin.rows; y++) {
@@ -74,7 +77,7 @@ void make_beauty(const Mat& origin,Mat& sliced){
                 sliced.data[idx+1] = origin.data[idx+1];    // g
                 sliced.data[idx+2] = origin.data[idx+2];    // r
             }
-            else{   //face (255) filter
+            else{   //face (255) filter(MAF)
                 
                 int b_sum = 0;
                 int g_sum = 0;
@@ -90,9 +93,9 @@ void make_beauty(const Mat& origin,Mat& sliced){
                         r_sum += origin.data[f_idx+2];
                     }                    
                 }
-                sliced.data[idx] = b_sum/9;
-                sliced.data[idx+1] = g_sum/9;
-                sliced.data[idx+2] = r_sum/9;
+                sliced.data[idx] = b_sum/9+intensity_pluser;
+                sliced.data[idx+1] = g_sum/9+intensity_pluser;
+                sliced.data[idx+2] = r_sum/9+intensity_pluser+red_offset;
             }
         }
     }
