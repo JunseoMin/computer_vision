@@ -56,6 +56,8 @@ void get_sliced(const Mat& origin, Mat& sliced) {
             }
         }
     }
+    imshow("map",sliced);
+
 }
 
 void make_beauty(const Mat& origin,Mat& sliced){
