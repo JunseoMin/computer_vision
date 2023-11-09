@@ -35,11 +35,11 @@ int main (void){
     generateSaltPepperNoise(lena512,saltpepperhigh,0.1);
 
     // show noised image
-    // imshow("origin", lena512);
-    // imshow("low noise Lena", lowGaussian_NoiseLena);
-    // imshow("high noise Lena", highGaussian_NoiseLena);
-    // imshow("saltpapper 0.05", saltpepperlow);
-    // imshow("saltpapper 0.1", saltpepperhigh);
+    imshow("origin", lena512);
+    imshow("low noise Lena", lowGaussian_NoiseLena);
+    imshow("high noise Lena", highGaussian_NoiseLena);
+    imshow("saltpapper 0.05", saltpepperlow);
+    imshow("saltpapper 0.1", saltpepperhigh);
 
     //filtering
     Mat filtered_mean_h_gaussian(lena512.rows,lena512.cols,lena512.type());
