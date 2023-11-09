@@ -103,9 +103,10 @@ void generateSaltPepperNoise(const Mat& input, Mat& output, const double percent
     for (int i = 0; i < num_saltNpepper; i++) {
         int x = rand() % input.rows;
         int y = rand() % input.cols;
+        int randval = rand();
 
         for (int c = 0; c < input.channels(); c++) {
-            if (rand() % 2 == 0) {
+            if (randval%2) {
                 output.at<Vec3b>(x, y)[c] = 255;  // salt
             } else {
                 output.at<Vec3b>(x, y)[c] = 0;    // pepper
