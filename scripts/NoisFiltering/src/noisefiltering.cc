@@ -8,7 +8,7 @@ using namespace std;
 void generateGaussianNoise(const Mat& input, Mat& output, const double dev, double mean);
 void generateSaltPepperNoise(const Mat& input, Mat& output, const double percentage);
 
-void median_filter(const Mat& input, Mat& output);
+void median_filter(const Mat& input, Mat& output, const int filter_axis_len);
 void mean_filter(const Mat& input, Mat& output, const int filter_axis_len);
 
 int main (void){
@@ -52,25 +52,25 @@ int main (void){
     Mat filtered_mean_h_sp(lena512.rows,lena512.cols,lena512.type());
     Mat filtered_med_h_sp(lena512.rows,lena512.cols,lena512.type());
 
-    mean_filter(lowGaussian_NoiseLena,filtered_mean_l_gaussian,3);
-    mean_filter(highGaussian_NoiseLena,filtered_mean_h_gaussian,3);
-    mean_filter(saltpepperlow,filtered_mean_l_sp,3);
-    mean_filter(saltpepperhigh,filtered_mean_h_sp,3);
+    mean_filter(lowGaussian_NoiseLena,filtered_mean_l_gaussian, 3);
+    mean_filter(highGaussian_NoiseLena,filtered_mean_h_gaussian, 3);
+    mean_filter(saltpepperlow,filtered_mean_l_sp, 3);
+    mean_filter(saltpepperhigh,filtered_mean_h_sp, 3);
 
-    // median_filter(lowGaussian_NoiseLena, filtered_med_l_gaussian);
-    // median_filter(highGaussian_NoiseLena, filtered_med_h_gaussian);
-    // median_filter(saltpepperlow, filtered_med_l_sp);
-    // median_filter(saltpepperhigh, filtered_med_h_sp);
+    median_filter(lowGaussian_NoiseLena, filtered_med_l_gaussian, 3);
+    median_filter(highGaussian_NoiseLena, filtered_med_h_gaussian, 3);
+    median_filter(saltpepperlow, filtered_med_l_sp, 3);
+    median_filter(saltpepperhigh, filtered_med_h_sp, 3);
 
     imshow("high gaussian mean filtered", filtered_mean_h_gaussian);
     imshow("low gaussian mean filtered", filtered_mean_l_gaussian);
     imshow("high salt&peppper mean filtered", filtered_mean_h_sp);
     imshow("low salt&peppper mean filtered", filtered_mean_l_sp);
 
-    // imshow("high gaussian median filtered", filtered_med_h_gaussian);
-    // imshow("low gaussian median filtered", filtered_med_l_gaussian);
-    // imshow("high salt&peppper median filtered", filtered_med_h_sp);
-    // imshow("low salt&peppper median filtered", filtered_med_l_sp);
+    imshow("high gaussian median filtered", filtered_med_h_gaussian);
+    imshow("low gaussian median filtered", filtered_med_l_gaussian);
+    imshow("high salt&peppper median filtered", filtered_med_h_sp);
+    imshow("low salt&peppper median filtered", filtered_med_l_sp);
 
     waitKey(0);
 
@@ -115,14 +115,44 @@ void generateSaltPepperNoise(const Mat& input, Mat& output, const double percent
     }
 }
 
-void median_filter(const Mat& input, Mat& output){
+void median_filter(const Mat& input, Mat& output, const int filter_axis_len){
     //3x3 median filter
-    
+    //zero padded
+    int filter_size = (filter_axis_len - 1) / 2;
+    int med_idx = (filter_axis_len*filter_axis_len+1)/2;
+
+    for (int x = 0; x < input.rows; x++)
+    {
+        for (int y = 0; y < input.cols; y++)
+        {
+            for (int c = 0; c < input.channels(); c++)
+            {
+                int median = 0;
+                vector<int> pixels;
+
+                for (int i = -filter_size; i <= filter_size; i++) {
+                    for (int j = -filter_size; j <= filter_size; j++) {
+                
+                        int _x = x + i;
+                        int _y = y + j;
+
+                        if (_x >= 0 && _x < input.rows && _y >= 0 && _y < input.cols) {
+                            pixels.push_back(input.at<Vec3b>(_x,_y)[c]);
+                        }
+                    }
+                }
+                
+                sort(pixels.begin(),pixels.end());
+                output.at<Vec3b>(x,y)[c] = pixels[med_idx];
+            }
+            
+        }
+    }
 }
 
 void mean_filter(const Mat& input, Mat& output, const int filter_axis_len) {
+    // zero padded
     int filter_size = (filter_axis_len - 1) / 2;
-
 
     for (int x = 0; x < input.rows; x++) {
         for (int y = 0; y < input.cols; y++) {
