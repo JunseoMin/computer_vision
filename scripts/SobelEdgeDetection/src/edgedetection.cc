@@ -6,7 +6,7 @@
 using namespace std;
 using namespace cv;
 
-void sobel_edge_mask(const Mat& input, Mat& output, bool heading);
+void sobel_edge_detect(const Mat& input, Mat& output, bool heading);
 
 int main(void){
     Mat lena512;
@@ -18,24 +18,43 @@ int main(void){
     Mat xSobel(lena512.rows, lena512.cols, lena512.type());
     Mat ySobel(lena512.rows, lena512.cols, lena512.type());
 
-    sobel_edge_mask(lena512, xSobel, true);
-    sobel_edge_mask(lena512, ySobel, true);
+    sobel_edge_detect(lena512, xSobel, true);
+    sobel_edge_detect(lena512, ySobel, false);
 
+    Mat sobel_Edge;
+
+    sobel_edge_mask(xSobel, ySobel, sobel_Edge, 0); //sobel edge masking by threshold = ?
+
+    // !! use CV function to apply gaussian filter !!
+    Mat gaussian_filtered_lena;
+    Mat gaussian_filtered_lena_high;
+
+    Mat filtered_sobel;
+    Mat filtered_sobel_high;
+
+    Mat x;
+    Mat y;
+
+    sobel_edge_detect(gaussian_filtered_lena, x, true);    //x
+    sobel_edge_detect(gaussian_filtered_lena, y, false);    //y
+
+    sobel_edge_mask(x, y, filtered_sobel, 0);
+    
+    sobel_edge_detect(gaussian_filtered_lena_high, x, true);    //x
+    sobel_edge_detect(gaussian_filtered_lena_high, y, false);    //y
+    
+    sobel_edge_mask(x, y, filtered_sobel_high, 0);
     
     return 0;
 }
 
 
-void sobel_edge_mask(const Mat& input, Mat& output, bool heading){  // true --> gx, false --> gy
-    
-    if (heading)
-    {
-        int x = input.rows;
-        int y = input.cols;
-    }
-    else{
-        int x = input.rows;
-        int y = input.cols;
-    }
-    
+void sobel_edge_detect(const Mat& input, Mat& output, bool heading){  // true --> gx, false --> gy
+    // apply sobel mask to output by heading x or y axis
+
+}
+
+void sobel_edge_mask(const Mat& x_image, const Mat& y_image, Mat& output, const size_t _Threshold){
+    // add sobel x and sobel y
+
 }
