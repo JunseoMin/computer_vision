@@ -35,6 +35,8 @@ int main(void){
     // !! use CV function to apply gaussian filter !!
     Mat gaussian_filtered_lena;
     Mat gaussian_filtered_lena_high;
+    GaussianBlur(lena512, gaussian_filtered_lena, Size(5, 5), 1.5);
+    GaussianBlur(lena512, gaussian_filtered_lena_high, Size(5, 5), 3.);
 
     Mat filtered_sobel;
     Mat filtered_sobel_high;
@@ -56,22 +58,50 @@ int main(void){
     imshow("gx image", xSobel);
     imshow("gy image", ySobel);
     imshow("without threshold image", sobel_Edge);
+
     imshow("low threshold", sobel_Edge_low);
     imshow("high threshold", sobel_Edge_high);
+    
     imshow("low sigma", filtered_sobel);
     imshow("high sigma", filtered_sobel_high);
 
-
+    waitKey(0);
     return 0;
 }
 
 
 void sobel_edge_detect(const Mat& input, Mat& output, bool heading){  // true --> gx, false --> gy
     // apply sobel mask to output by heading x or y axis
+    Mat sobelKernel;
+    if (heading) {
+        sobelKernel = (Mat_<int>(3, 3) << -1, 0, 1, -2, 0, 2, -1, 0, 1);
+    } else {
+        sobelKernel = (Mat_<int>(3, 3) << -1, -2, -1, 0, 0, 0, 1, 2, 1);
+    }
+
+    Mat result = Mat::zeros(input.size(), CV_32S);
+
+    for (int i = 1; i < input.rows - 1; ++i) {
+        for (int j = 1; j < input.cols - 1; ++j) {
+            int sum = 0;
+            for (int k = -1; k <= 1; ++k) {
+                for (int l = -1; l <= 1; ++l) {
+                    sum += input.at<uchar>(i + k, j + l) * sobelKernel.at<int>(1 + k, 1 + l);
+                }
+            }
+            result.at<int>(i, j) = sum;
+        }
+    }
 
 }
 
 void sobel_edge_mask(const Mat& x_image, const Mat& y_image, Mat& output, const size_t _Threshold){
     // add sobel x and sobel y
-
+    
+    for (int i = 0; i < x_image.rows; ++i) {
+        for (int j = 0; j < x_image.cols; ++j) {
+            int magnitude = sqrt(pow(x_image.at<uchar>(i, j), 2) + pow(y_image.at<uchar>(i, j), 2));
+            output.at<uchar>(i, j) = (magnitude > _Threshold) ? 255 : 0;
+        }
+    }
 }
