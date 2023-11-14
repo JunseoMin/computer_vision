@@ -7,6 +7,7 @@ using namespace std;
 using namespace cv;
 
 void sobel_edge_detect(const Mat& input, Mat& output, bool heading);
+void sobel_edge_mask(const Mat& x_image, const Mat& y_image, Mat& output, const size_t _Threshold);
 
 int main(void){
     Mat lena512;
