@@ -92,7 +92,7 @@ void sobel_edge_detect(const Mat& input, Mat& output, bool heading){  // true --
                     sum += input.at<uchar>(i + k, j + l) * sobelKernel.at<int>(1 + k, 1 + l);
                 }
             }
-            output.at<uchar>(i, j) = static_cast<uchar> (max(0,min(sum,255)));
+            output.at<uchar>(i, j) = static_cast<uchar> (min(((sum > 0) ? sum : -sum), 255));
         }
     }
 
