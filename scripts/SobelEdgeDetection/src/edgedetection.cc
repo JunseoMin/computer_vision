@@ -29,8 +29,8 @@ int main(void){
 
     sobel_edge_mask(xSobel, ySobel, sobel_Edge, 0); //sobel edge(gx + gy)
 
-    sobel_edge_mask(xSobel, ySobel, sobel_Edge_low, 30); //sobel edge masking by low threshold = ?
-    sobel_edge_mask(xSobel, ySobel, sobel_Edge_high, 100); //sobel edge masking by high threshold = ?(higher threashold than before)
+    sobel_edge_mask(xSobel, ySobel, sobel_Edge_low, 30); //sobel edge masking by low threshold = 30
+    sobel_edge_mask(xSobel, ySobel, sobel_Edge_high, 100); //sobel edge masking by high threshold = 100(higher threashold than before)
 
     // // !! use CV function to apply gaussian filter !!
     Mat gaussian_filtered_lena;
