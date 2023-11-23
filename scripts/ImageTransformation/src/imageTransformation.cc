@@ -11,6 +11,10 @@ private:
     double m2;
     double m3;
     double m4;
+
+    int t1;
+    int t2;
+
     Mat M;
 
     vector<pair<int, int>> points_origin;
@@ -58,6 +62,8 @@ public:
     {
         this->points_origin = _points_origin;
         this->points_transformed = _points_transformed;
+        this->t1 = 0;
+        this->t2 = 0;
         solve_transform();
         set_matrix();
     }
@@ -72,6 +78,12 @@ public:
 
         return make_pair(x_, y_);
     }
+
+    void set_parallel(const int _t1, const int _t2){
+        this -> t1 = _t1;
+        this -> t2 = _t2;
+    }
+
 };
 
 int main()
