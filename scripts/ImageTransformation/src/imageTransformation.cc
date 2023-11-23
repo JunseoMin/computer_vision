@@ -4,6 +4,7 @@
 
 using namespace cv;
 using namespace std;
+
 class TransformFunction
 {
 private:
@@ -89,15 +90,27 @@ public:
 int main()
 {
     Mat input_img = imread("/home/junseo/2023-2/computer_vision/images/hw_6_img/lena_t.jpg");    
-    Mat transformed_img;    
+    Mat transformed_img(512,512,input_img.type());    
 
     vector<pair<int,int>> origin = {{173, 284}, {477, 33}, {248, 455}, {553, 193}};
     vector<pair<int,int>> transformed = {{100, 100}, {412, 100}, {100, 412}, {412, 412}};
 
-    TransformFunction(origin, transformed);
+    TransformFunction func(origin, transformed);
 
+    pair<int,int> _pair;
+
+    for (int x = 0; x < input_img.rows; x++)
+    {
+        for (int y = 0; y < input_img.cols; y++)
+        {
+            _pair = func.returnTransformed(x, y);
+            transformed_img.at<Vec3b>(_pair.first, _pair.second) = input_img.at<Vec3b>(x, y);
+        }
+    }
+    
 
     imshow("original",input_img);
+    imshow("transformed",transformed_img);
     waitKey(0);
 
 
