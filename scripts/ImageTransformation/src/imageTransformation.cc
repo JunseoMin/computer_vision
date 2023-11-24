@@ -11,28 +11,27 @@ private:
     Mat M;
 
 public:
-    TransformFunction(const vector<Point2f>& src_pts, const vector<Point2f>& dst_pts)
+    TransformFunction(const vector<Point2f>& origin, const vector<Point2f>& transformed)
     {
-        // 직접 변환 행렬을 계산
         Mat A(8, 8, CV_64F, Scalar(0));
         Mat B(8, 1, CV_64F);
 
         for (int i = 0; i < 4; ++i)
         {
-            A.at<double>(2 * i, 0) = src_pts[i].x;
-            A.at<double>(2 * i, 1) = src_pts[i].y;
+            A.at<double>(2 * i, 0) = origin[i].x;
+            A.at<double>(2 * i, 1) = origin[i].y;
             A.at<double>(2 * i, 2) = 1;
-            A.at<double>(2 * i, 6) = -src_pts[i].x * dst_pts[i].x;
-            A.at<double>(2 * i, 7) = -src_pts[i].y * dst_pts[i].x;
+            A.at<double>(2 * i, 6) = -origin[i].x * transformed[i].x;
+            A.at<double>(2 * i, 7) = -origin[i].y * transformed[i].x;
 
-            A.at<double>(2 * i + 1, 3) = src_pts[i].x;
-            A.at<double>(2 * i + 1, 4) = src_pts[i].y;
+            A.at<double>(2 * i + 1, 3) = origin[i].x;
+            A.at<double>(2 * i + 1, 4) = origin[i].y;
             A.at<double>(2 * i + 1, 5) = 1;
-            A.at<double>(2 * i + 1, 6) = -src_pts[i].x * dst_pts[i].y;
-            A.at<double>(2 * i + 1, 7) = -src_pts[i].y * dst_pts[i].y;
+            A.at<double>(2 * i + 1, 6) = -origin[i].x * transformed[i].y;
+            A.at<double>(2 * i + 1, 7) = -origin[i].y * transformed[i].y;
 
-            B.at<double>(2 * i, 0) = dst_pts[i].x;
-            B.at<double>(2 * i + 1, 0) = dst_pts[i].y;
+            B.at<double>(2 * i, 0) = transformed[i].x;
+            B.at<double>(2 * i + 1, 0) = transformed[i].y;
         }
 
         Mat X;
