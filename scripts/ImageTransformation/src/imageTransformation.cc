@@ -5,163 +5,90 @@
 using namespace cv;
 using namespace std;
 
-void bilinear_interpolation(int x_size,int y_size,const Mat& img);
-
 class TransformFunction
 {
 private:
-    Mat A;
-    Mat B;
-
-    Mat A_inv;
-
-    double m1;
-    double m2;
-    double m3;
-    double m4;
-
-    int t1;
-    int t2;
-
     Mat M;
-    Mat M_inv;
-
-    vector<pair<int, int>> points_origin;
-    vector<pair<int, int>> points_transformed;
-
-    void solve_transform() // Calculate unknowns
-    {
-        // Solve for unknowns (m1, m2, m3, m4)
-        Mat X;
-        solve(A,B,X,DECOMP_SVD);
-
-        m1 = X.at<double>(0, 0);
-        m2 = X.at<double>(1, 0);
-        m3 = X.at<double>(2, 0);
-        m4 = X.at<double>(3, 0);
-        t1 = X.at<double>(4, 0);
-        t2 = X.at<double>(5, 0);
-        cout<<X<<endl;
-    }
-
-    void set_matrix()
-    {
-        M = (Mat_<double>(2, 2) << m1, m2, m3, m4);
-        M_inv = invert(M,M_inv,DECOMP_SVD);
-        cout<<M<<endl;
-    }
-
-    void set_clac_matrix()
-    {
-        //setting A,B size
-        A = A.zeros(2*points_origin.size(),6,CV_64F);
-        B = B.zeros(2*points_origin.size(),1,CV_64F);
-        //setting matrix
-        for (int i = 0; i < points_origin.size(); i++)
-        {
-            // x y 0 0 1 0
-            A.at<double>(i * 2, 0) = points_origin[i].first;
-            A.at<double>(i * 2, 1) = points_origin[i].second;
-            A.at<double>(i * 2, 2) = 0;
-            A.at<double>(i * 2, 3) = 0;
-            A.at<double>(i * 2, 4) = 1;
-            A.at<double>(i * 2, 5) = 0;
-
-            B.at<double>(i * 2, 0) = points_transformed[i].first;
-
-            // 0 0 x y 0 1
-            A.at<double>(i * 2 + 1, 0) = 0;
-            A.at<double>(i * 2 + 1, 1) = 0;
-            A.at<double>(i * 2 + 1, 2) = points_origin[i].first;
-            A.at<double>(i * 2 + 1, 3) = points_origin[i].second;
-            A.at<double>(i * 2 + 1, 4) = 0;
-            A.at<double>(i * 2 + 1, 5) = 1;
-
-            B.at<double>(i * 2 + 1, 0) = points_transformed[i].second;
-        }
-
-        //debug
-        // cout<<A<<endl;
-        // cout<<B<<endl;
-        //
-        // invert(A,A_inv,DECOMP_SVD);
-        // cout<<A_inv<<endl;
-        // cout<<A*A_inv<<endl;
-    }
 
 public:
-
-    TransformFunction(vector<pair<int, int>> _points_origin, vector<pair<int, int>> _points_transformed)
+    TransformFunction(const vector<Point2f>& src_pts, const vector<Point2f>& dst_pts)
     {
-        this->points_origin = _points_origin;
-        this->points_transformed = _points_transformed;
-        set_clac_matrix();
-        solve_transform();
-        set_matrix();
+        // 직접 변환 행렬을 계산
+        Mat A(8, 8, CV_64F, Scalar(0));
+        Mat B(8, 1, CV_64F);
+
+        for (int i = 0; i < 4; ++i)
+        {
+            A.at<double>(2 * i, 0) = src_pts[i].x;
+            A.at<double>(2 * i, 1) = src_pts[i].y;
+            A.at<double>(2 * i, 2) = 1;
+            A.at<double>(2 * i, 6) = -src_pts[i].x * dst_pts[i].x;
+            A.at<double>(2 * i, 7) = -src_pts[i].y * dst_pts[i].x;
+
+            A.at<double>(2 * i + 1, 3) = src_pts[i].x;
+            A.at<double>(2 * i + 1, 4) = src_pts[i].y;
+            A.at<double>(2 * i + 1, 5) = 1;
+            A.at<double>(2 * i + 1, 6) = -src_pts[i].x * dst_pts[i].y;
+            A.at<double>(2 * i + 1, 7) = -src_pts[i].y * dst_pts[i].y;
+
+            B.at<double>(2 * i, 0) = dst_pts[i].x;
+            B.at<double>(2 * i + 1, 0) = dst_pts[i].y;
+        }
+
+        Mat X;
+        solve(A, B, X, DECOMP_SVD);
+
+        M = Mat(3, 3, CV_64F, Scalar(0));
+        M.at<double>(0, 0) = X.at<double>(0, 0);
+        M.at<double>(0, 1) = X.at<double>(1, 0);
+        M.at<double>(0, 2) = X.at<double>(2, 0);
+        M.at<double>(1, 0) = X.at<double>(3, 0);
+        M.at<double>(1, 1) = X.at<double>(4, 0);
+        M.at<double>(1, 2) = X.at<double>(5, 0);
+        M.at<double>(2, 0) = X.at<double>(6, 0);
+        M.at<double>(2, 1) = X.at<double>(7, 0);
+        M.at<double>(2, 2) = 1;
     }
 
-    pair<int, int> returnTransformed(const int x, const int y)
+    Point2f transformPoint(const Point2f& point)
     {
-        Mat input = (Mat_<double>(2, 1) << x, y);
-        Mat result = M * input + (Mat_<double>(2, 1) << t1, t2);
+        Mat pointMat = (Mat_<double>(3, 1) << point.x, point.y, 1);
+        Mat transformedPoint = M * pointMat;
 
-        int x_ = static_cast<int>(result.at<double>(0, 0));
-        int y_ = static_cast<int>(result.at<double>(1, 0));
-
-        return make_pair(x_, y_);
+        return Point2f(static_cast<float>(transformedPoint.at<double>(0, 0) / transformedPoint.at<double>(2, 0)),
+                       static_cast<float>(transformedPoint.at<double>(1, 0) / transformedPoint.at<double>(2, 0)));
     }
-
 };
-
 
 int main()
 {
-    Mat input_img = imread("/home/junseo/2023-2/computer_vision/images/hw_6_img/lena_t.jpg");
-    cvtColor(input_img, input_img, COLOR_BGR2GRAY);
+    Mat input_img = imread("/home/junseo/2023-2/computer_vision/images/hw_6_img/lena_t.jpg", IMREAD_GRAYSCALE);
 
-    Mat transformed_img(512,512,input_img.type());    
-    float _x = (input_img.rows/512.0);
-    float _y = (input_img.cols/512.0);
-    vector<pair<int,int>> origin = {{173, 284}, {477, 33}, {248, 455}, {553, 193}};
-    vector<pair<int,int>> transformed = {{100, 100}, {412, 100}, {100, 412}, {412, 412}};
+    vector<Point2f> origin = {Point2f(173, 284), Point2f(477, 33), Point2f(248, 455), Point2f(553, 193)};
+    vector<Point2f> transformed = {Point2f(100, 100), Point2f(412, 100), Point2f(100, 412), Point2f(412, 412)};
     TransformFunction func(origin, transformed);
-    
-    // //debug
-    // cout<<func.m1<<endl;
-    // cout<<func.m2<<endl;
-    // cout<<func.m3<<endl;
-    // cout<<func.m4<<endl;
-    // cout<<func.t1<<endl;
-    // cout<<func.t2<<endl;
 
-    cout<<func.returnTransformed(173,284).first;
-    cout<<func.returnTransformed(173,284).second<<endl;
+    Mat transformed_img(512, 512, input_img.type());
 
-    pair<int,int> _pair;
+    for (int x = 0; x < input_img.rows; x++)
+    {
+        for (int y = 0; y < input_img.cols; y++)
+        {
+            Point2f transformed_point = func.transformPoint(Point2f(y, x));
 
-    int t_x;
-    int t_y;
+            int t_x = static_cast<int>(transformed_point.y);
+            int t_y = static_cast<int>(transformed_point.x);
 
-    for (int x = 0; x < input_img.rows; x++) {
-        for (int y = 0; y < input_img.cols; y++) {
-            _pair = func.returnTransformed(x, y);
-            t_x = static_cast<int>(_pair.first * _x);
-            t_y = static_cast<int>(_pair.second * _y);
-            if (t_y>400)
+            if (t_x >= 0 && t_x < transformed_img.rows && t_y >= 0 && t_y < transformed_img.cols)
             {
-                cout<<t_y<<endl;
-                /* code */
+                transformed_img.at<uchar>(t_x, t_y) = input_img.at<uchar>(x, y);
             }
-            
-            transformed_img.at<u_char>(t_x, t_y) = input_img.at<u_char>(x, y);
         }
-    }    
-    
-    // imshow("original",input_img);
-    // imshow("transformed",transformed_img);
-    // waitKey(0);
+    }
 
-    // bilinear_interpolation(512,512, transformed_img);
+    imshow("original", input_img);
+    imshow("transformed", transformed_img);
+    waitKey(0);
 
     return 0;
 }
