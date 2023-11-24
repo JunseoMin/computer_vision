@@ -5,13 +5,13 @@
 using namespace cv;
 using namespace std;
 
-class AffineTransform
+class TransformFunction
 {
 private:
     Mat M;
 
 public:
-    AffineTransform(const vector<Point2f>& origin, const vector<Point2f>& transformed)
+    TransformFunction(const vector<Point2f>& origin, const vector<Point2f>& transformed)
     {
         Mat A(2 * origin.size(), 6, CV_64F, Scalar(0));
         Mat B(2 * origin.size(), 1, CV_64F);
@@ -63,7 +63,7 @@ int main()
 
     vector<Point2f> origin = {Point2f(173, 284), Point2f(477, 33), Point2f(248, 455), Point2f(553, 193)};
     vector<Point2f> transformed = {Point2f(100, 100), Point2f(412, 100), Point2f(100, 412), Point2f(412, 412)};
-    AffineTransform transform(origin, transformed);
+    TransformFunction transform(origin, transformed);
 
     Mat transformed_img(512, 512, input_img.type());
 
